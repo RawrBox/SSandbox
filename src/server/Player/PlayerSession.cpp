@@ -53,18 +53,21 @@ void Session::HandleEnumCharacters(Packet const& packet)
     SendPacket(available);
 
     Packet featureGlueScreen(Opcode::SMSG_FEATURE_STATUS_GLUE_SCREEN);
-    featureGlueScreen.WriteBits<18>(0); // All false
+    featureGlueScreen.WriteBits<19>(0); // All false
     featureGlueScreen.FlushBits();
     featureGlueScreen << uint32(0);
     featureGlueScreen << uint32(0);
-    featureGlueScreen << uint64(0);
-    featureGlueScreen << uint32(150);   // Max amount of characters
+    featureGlueScreen << int64(0);
+    featureGlueScreen << int32(150);   // Max amount of characters
     featureGlueScreen << uint32(0);
     featureGlueScreen << uint32(0);
+    featureGlueScreen << int32(0);
+    featureGlueScreen << int32(0);
+    featureGlueScreen << int32(Globals::Expansion);
+    featureGlueScreen << int32(Globals::Expansion);
+    featureGlueScreen << int32(0);
     featureGlueScreen << uint32(0);
-    featureGlueScreen << uint32(0);
-    featureGlueScreen << uint32(Globals::Expansion);
-    featureGlueScreen << uint32(Globals::Expansion);
+    featureGlueScreen << int16(0);
     SendPacket(featureGlueScreen);
 
     auto const& raceInfo = World::Connection::RaceClassInfo::Instance();
@@ -129,46 +132,60 @@ void Session::HandlePlayerLogin(Packet const& packet)
     _currentCharacter->FinishLoggingIn();
 }
 
-void Session::HandleQueryPlayerName(Packet const& packet)
+void Session::HandleQueryPlayerNames(Packet const& packet)
 {
-    Game::ObjectGuid guid;
-    packet >> guid;
+    uint32 playersSize;
+    packet >> playersSize;
 
-    auto character = _accountInfo->GetCharacterByID(guid.GetLoPart());
+    Packet response(Opcode::SMSG_QUERY_PLAYER_NAMES_RESPONSE);
+    response << uint32(playersSize);
 
-    if (!character)
-        return;
+    for (uint32 i = 0; i < playersSize; ++i)
+    {
+        Game::ObjectGuid player;
+        packet >> player;
 
-    Packet response(Opcode::SMSG_QUERY_PLAYER_NAME_RESPONSE);
-    response << uint8(0);
-    response << guid;
+        auto character = _accountInfo->GetCharacterByID(player.GetLoPart());
 
-    response.WriteBits<1>(0);
-    response.WriteBits<6>(character->_name.length());
+        response << uint8(character ? 0 : 1);
+        response << player;
 
-    for (int i = 0; i < 5; ++i)
-        response.WriteBits<7>(0);
+        response.WriteBits<1>(character ? true : false);
+        response.WriteBits<1>(false);
+        response.FlushBits();
 
-    response.FlushBits();
+        if (character)
+        {
+            response.WriteBits<1>(0);
+            response.WriteBits<6>(character->_name.length());
 
-    response << Game::ObjectGuid(Game::ObjectGuid::HighGuid::WowAccount, _accountInfo->GetID());
-    response << Game::ObjectGuid(Game::ObjectGuid::HighGuid::BNetAccount, _accountInfo->GetID());
-    response << guid;
+            for (int i = 0; i < 5; ++i)
+                response.WriteBits<7>(0);
 
-    response << uint64(0);
-    response << uint32(33619968);
-    response << uint8(character->_race);
-    response << uint8(character->_sex);
-    response << uint8(character->_class);
-    response << uint8(character->_level);
-    response.WriteString(character->_name);
+            response.FlushBits();
+
+            response << Game::ObjectGuid(Game::ObjectGuid::HighGuid::WowAccount, _accountInfo->GetID());
+            response << Game::ObjectGuid(Game::ObjectGuid::HighGuid::BNetAccount, _accountInfo->GetID());
+            response << player;
+
+            response << uint64(0);
+            response << uint32(33619968);
+            response << uint8(character->_race);
+            response << uint8(character->_sex);
+            response << uint8(character->_class);
+            response << uint8(character->_level);
+            response << uint8(0);
+            response.WriteString(character->_name);
+        }
+    }
+
     SendPacket(response);
 }
 
 void Session::HandleChat(Packet const& packet)
 {
     packet.ReadSkip<int32>();   // Language
-    auto length = packet.ReadBits<9>();
+    auto length = packet.ReadBits<11>();
     auto message = packet.ReadString(length);
 
     if (message.size() && message[0] == '!')
@@ -188,6 +205,9 @@ void Session::HandleMovement(Packet const& packet)
     Game::ObjectGuid guid;
 
     packet >> guid;
+    packet.ReadSkip<uint32>();    // Flags[0]
+    packet.ReadSkip<uint32>();    // Flags[1]
+    packet.ReadSkip<uint32>();    // Flags[2]
     packet.ReadSkip<uint32>();    // Time
     packet >> _currentCharacter->_position;
     packet >> _currentCharacter->_orientation;
@@ -206,6 +226,8 @@ void Session::HandleSuspendTokenResponse(Packet const& packet)
     newWorld << int32(_currentCharacter->GetMapID());
     newWorld << _currentCharacter->GetPosition();
     newWorld << _currentCharacter->GetOrientation();
+    newWorld << int32(-1);
+    newWorld << int32(-1);
     newWorld << uint32(16); // NormalTP
     newWorld << Game::Position(); // Offset
     SendPacket(newWorld);

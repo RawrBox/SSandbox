@@ -25,7 +25,7 @@ namespace Game
 
 std::atomic<uint64> gIDCounter = 0;
 
-Character::Character() : Object({ ObjectGuid::HighGuid::Player, gIDCounter++}, ObjectType::Player), _position(-2325, -5124, 6570), _session(nullptr), _flightSpeed(1.f)
+Character::Character() : Object({ ObjectGuid::HighGuid::Player, gIDCounter++}, ObjectType::Player), _position(241.612411f, -2999.420166f, 1514.297363f), _session(nullptr), _flightSpeed(1.f)
 {
     std::fill(_equipedItems.begin(), _equipedItems.end(), 0);
 }
@@ -50,19 +50,12 @@ void Character::ReadCreationFromBuffer(Buffer const& buffer)
     uint32 characterOptionsCount;
 
     buffer.ReadBits<1>(); // IsTrialBoost
-    buffer.ReadBits<1>(); // Unk901
+    buffer.ReadBits<1>(); // UseNPE
 
     buffer >> _race;
     buffer >> _class;
     buffer >> _sex;
     buffer >> characterOptionsCount;
-    buffer >> _skin;
-    buffer >> _face;
-    buffer >> _hairStyle;
-    buffer >> _hairColor;
-    buffer >> _facialHairStyle;
-    buffer >> _outfitID;
-    buffer.ReadBytes(_customDisplayData.data(), _customDisplayData.size());
     _name = buffer.ReadString(length);
 
     if (hasTemplateSet)
@@ -76,21 +69,15 @@ void Character::ReadCreationFromBuffer(Buffer const& buffer)
 void Character::FinishCreatingCharacter()
 {
     _level = Globals::MaxLevel;
-    _mapID = 2222;
+    _mapID = 2444;
     _orientation = 0;
 
-    for (auto outfit : DataStores::CharStartOutfit)
+    for (auto itemID : DataStores::GetItemsForCharacterLoadout(_race, _class, 9))
     {
-        if (outfit.RaceID == _race && outfit.ClassID == _class)
-        {
-            for (auto itemID : outfit.ItemID)
-            {
-                auto slot = GetEquipmentSlotForItem(itemID);
+        auto slot = GetEquipmentSlotForItem(itemID);
 
-                if (slot != EquipmentSlot::None)
-                    _equipedItems[Utils::ToUnderlying(slot)] = itemID;
-            }
-        }
+        if (slot != EquipmentSlot::None)
+            _equipedItems[Utils::ToUnderlying(slot)] = itemID;
     }
 
     if (!DataStores::ChrRaces[_race]->Alliance)
@@ -146,10 +133,10 @@ void Character::FinishLoggingIn()
 
     Packet accountDataTimes(Opcode::SMSG_ACCOUNT_DATA_TIMES);
     accountDataTimes << GetGUID();
-    accountDataTimes << uint32(time(nullptr));
+    accountDataTimes << time(nullptr);
 
-    for (int i = 0; i < 8; ++i)
-        accountDataTimes << uint32((i == 0 || i == 4) ? time(nullptr) : 0);
+    for (int i = 0; i < 15; ++i)
+        accountDataTimes << int64((i == 0 || i == 4) ? time(nullptr) : 0);
 
     _session->SendPacket(accountDataTimes);
 
@@ -209,12 +196,6 @@ void Character::WriteEnumCharacter(Buffer& buffer, uint8 index) const
     buffer << uint8(_class);
     buffer << uint8(_sex);
     buffer << uint32(_customizationOptions.size());
-    buffer << uint8(_skin);
-    buffer << uint8(_face);
-    buffer << uint8(_hairStyle);
-    buffer << uint8(_hairColor);
-    buffer << uint8(_facialHairStyle);
-    buffer.WriteBytes(_customDisplayData.data(), _customDisplayData.size());
     buffer << uint8(_level);
     buffer << int32(0);    // Zone
     buffer << int32(_mapID);
@@ -237,12 +218,14 @@ void Character::WriteEnumCharacter(Buffer& buffer, uint8 index) const
 
         buffer << uint32(itemModifiedAppearance ? DataStores::ItemAppearence[itemModifiedAppearance->ItemAppearanceID]->ItemDisplayInfoID : 0);
         buffer << uint32(0);    // Enchant
+        buffer << int32(0);
         buffer << uint8(itemEntry ? itemEntry->InventoryType : 0);
-        buffer << uint8(itemEntry ? itemEntry->SubClassID : 0);
+        buffer << uint8(itemEntry ? itemEntry->SubclassID : 0);
     }
 
-    buffer << uint32(0);
+    buffer << int64(0);
     buffer << uint16(0);
+    buffer << uint32(0);
     buffer << uint32(0);
     buffer << uint32(0);
     buffer << uint32(0);
@@ -285,6 +268,9 @@ void Character::WriteMovementCreateBlock(Buffer& buffer) const
 
     buffer << GetGUID();
     buffer << uint32(0);
+    buffer << uint32(0);
+    buffer << uint32(0);
+    buffer << uint32(0);
     buffer << _position;
     buffer << float(_orientation);
 
@@ -294,8 +280,7 @@ void Character::WriteMovementCreateBlock(Buffer& buffer) const
     buffer << uint32(0);
     buffer << uint32(0);
 
-    buffer.WriteBits<30>(0);
-    buffer.WriteBits<18>(0);
+    buffer.WriteBits<1>(0);
     buffer.WriteBits<1>(0);
     buffer.WriteBits<1>(0);
     buffer.WriteBits<1>(0);
@@ -314,6 +299,12 @@ void Character::WriteMovementCreateBlock(Buffer& buffer) const
 
     buffer << uint32(0);
     buffer << float(1.0f);
+    buffer << float(0.f);
+    buffer << float(0.f);
+    buffer << float(0.f);
+    buffer << float(0.f);
+    buffer << float(0.f);
+    buffer << float(0.f);
 
     buffer.WriteBits<1>(0);
     buffer.FlushBits();
@@ -344,7 +335,7 @@ void Character::WriteUnitData(Buffer& buffer) const
     buffer << uint32(0);                    // StateAnimKitId
     buffer << uint32(0);                    // StateWorldEffectIdSize
     buffer << uint32(0);                    // StateWorldEffectsQuestObjectiveId
-    buffer << uint32(0);                    // Field_2C <- NEW
+    buffer << int32(0);                     // SpellOverrideNameId
 
     buffer << ObjectGuid();                 // Charm
     buffer << ObjectGuid();                 // Summon
@@ -356,10 +347,12 @@ void Character::WriteUnitData(Buffer& buffer) const
     buffer << ObjectGuid();                 // LookAtControllerTarget
     buffer << ObjectGuid();                 // Target
     buffer << ObjectGuid();                 // BattlePetCompanionGuid
-    buffer << uint64(0);                    // BattlePetDBID
-    buffer << uint32(0);                    // ChannelData - SpellId
-    buffer << uint32(0);                    // ChannelData - SpellXSpellVisualId
-    buffer << uint32(0);                    // SummonedByHomeReal
+    buffer << uint64(0);                    // BattlePetDBId
+    buffer << int32(0);                     // ChannelData - SpellId
+    buffer << int32(0);                     // ChannelData - SpellXSpellVisualId
+    buffer << int32(0);                     // ChannelData - ScriptVisualId
+    buffer << int8(0);                      // Unknown
+    buffer << uint32(0);                    // SummonedByHomeRealm
     buffer << uint8(_race);                 // Race
     buffer << uint8(_class);                // Class
     buffer << uint8(_class);                // PlayerClassId
@@ -368,13 +361,13 @@ void Character::WriteUnitData(Buffer& buffer) const
     buffer << uint32(0);                    // OverrideDisplayPower
     buffer << int64(1);                     // Health
 
-    for (std::size_t i = 0; i < 6; ++i)
+    for (std::size_t i = 0; i < 7; ++i)
     {
         buffer << int32(0);                 // Power
         buffer << int32(0);                 // MaxPower
     }
 
-    for (std::size_t i = 0; i < 6; ++i)
+    for (std::size_t i = 0; i < 7; ++i)
     {
         buffer << float(1.f);               // PowerRegenFlatModifier
         buffer << float(1.f);               // PowerRegenInterruptedFlatModifier
@@ -394,7 +387,8 @@ void Character::WriteUnitData(Buffer& buffer) const
 
     for (std::size_t i = 0; i < 3; ++i)
     {
-        buffer << uint32(0);                // VirtualItem - ItemId
+        buffer << int32(0);                 // VirtualItem - ItemId
+        buffer << int32(0);                 // VirtualItem - SecondaryItemModifiedAppearanceId
         buffer << uint16(0);                // VirtualItem - ItemAppearanceId
         buffer << uint16(0);                // VirtualItem - ItemVisual
     }
@@ -413,9 +407,9 @@ void Character::WriteUnitData(Buffer& buffer) const
     buffer << float(1);                     // BoundingRadius
     buffer << float(1);                     // CombatReach
     buffer << float(1);                     // DisplayScale
+    buffer << int32(0);                     // CreatureFamily
+    buffer << int32(0);                     // CreatureType
     buffer << int32(GetNativeDisplayID());  // NativeDisplayId
-    buffer << int32(0);                     // NEW
-    buffer << int32(0);                     // NEW
     buffer << float(1);                     // NativeXDisplayScale
     buffer << int32(0);                     // MountDisplayId
     buffer << int32(0);                     // CosmeticMountDisplayId
@@ -434,6 +428,7 @@ void Character::WriteUnitData(Buffer& buffer) const
     buffer << uint32(0);                    // PetExperience
     buffer << uint32(0);                    // PetNextLevelExperience
     buffer << float(1);                     // ModCastingSpeed
+    buffer << float(1);                     // ModCastingSpeedNeg
     buffer << float(1);                     // ModSpellHaste
     buffer << float(1);                     // ModHaste
     buffer << float(1);                     // ModRangedHaste
@@ -457,8 +452,7 @@ void Character::WriteUnitData(Buffer& buffer) const
     for (std::size_t i = 0; i < 7; ++i)
     {
         buffer << int32(0);                 // BonusResistanceMods
-        buffer << int32(0);                 // PowerCostModifier
-        buffer << float(1);                 // PowerCostMultiplier
+        buffer << int32(0);                 // ManaCostModifier
     }
 
     buffer << int32(1);                     // BaseMana
@@ -484,27 +478,29 @@ void Character::WriteUnitData(Buffer& buffer) const
     buffer << float(0);                     // Lifesteal
     buffer << float(0);                     // MinRangedDamage
     buffer << float(0);                     // MaxRangedDamage
-    buffer << float(1);                     // ManaCostModiferModifier
+    buffer << float(1);                     // ManaCostMultiplier
     buffer << float(1);                     // MaxHealthModifier
 
-    buffer << float(0);                     // Hoverheight
+    buffer << float(0);                     // HoverHeight
     buffer << int32(0);                     // MinItemLevelCutoff
     buffer << int32(0);                     // MinItemLevel
     buffer << int32(0);                     // MaxItemLevel
     buffer << int32(0);                     // AzeriteItemLevel
     buffer << int32(0);                     // WildBattlePetLevel
+    buffer << int32(0);                     // BattlePetCompanionExperience
     buffer << uint32(0);                    // BattlePetCompanionNameTimestamp
     buffer << int32(0);                     // InteractSpellId
     buffer << int32(0);                     // ScaleDuration
-    buffer << int32(0);                     // SpellOverrideNameId
     buffer << int32(0);                     // LooksLikeMountId
     buffer << int32(0);                     // LooksLikeCreatureId
-    buffer << int32(0);                     // ????? LookAtControllerId
+    buffer << int32(0);                     // LookAtControllerId
+    buffer << int32(0);                     // TaxiNodesId
     buffer << ObjectGuid();                 // GuildGuid
-    buffer << uint32(0);                    // PassiveSpells
-    buffer << uint32(0);                    // WorldEffects
-    buffer << uint32(0);                    // ChannelObjects
-    buffer << ObjectGuid();                 // SkinningOwnerGuid
+    buffer << uint32(0);                    // PassiveSpells.size()
+    buffer << uint32(0);                    // WorldEffects.size()
+    buffer << uint32(0);                    // ChannelObjects.size()
+    buffer << uint32(0);                    // SilencedSchoolMask;
+    buffer << ObjectGuid();                 // NameplateAttachToGUID
 }
 
 void Character::WritePlayerData(Buffer& buffer) const
@@ -518,12 +514,6 @@ void Character::WritePlayerData(Buffer& buffer) const
     buffer << uint32(0);                    // GuildDeleteDate
     buffer << int32(0);                     // GuildLevel
     buffer << uint32(_customizationOptions.size());
-    buffer << uint8(_skin);                 // Skin
-    buffer << uint8(_face);                 // Face
-    buffer << uint8(_hairStyle);            // HairStyle
-    buffer << uint8(_hairColor);            // HairColor
-    buffer.WriteBytes(_customDisplayData.data(), _customDisplayData.size());
-    buffer << uint8(_facialHairStyle);      // FacialHairStyle
     buffer << uint8(0);                     // PartyType
     buffer << uint8(_sex);                  // NativeSex
     buffer << uint8(0);                     // Inebriation
@@ -538,66 +528,74 @@ void Character::WritePlayerData(Buffer& buffer) const
         buffer << uint32(0);                // StateFlags
         buffer << uint32(0);                // EndTime
         buffer << uint32(0);                // AcceptTime
-        buffer << uint32(0);                // Field_10
+        buffer << uint32(0);                // ObjectiveFlags
         for (std::size_t j = 0; j < 24; ++j)
         {
             buffer << int16(0);             // ObjectiveProgress
         }
     }
 
-    buffer << uint32(0);
+    buffer << uint32(0);                    // QuestSessionQuestLog.size()
 
     for (std::size_t i = 0; i < 19; ++i)
     {
-        auto itemModfiedAppearanceEntry = DataStores::GetItemModifiedAppearanceByItemID(_equipedItems[i]);
-        buffer << uint32(_equipedItems[i]);                                                                                             // VisibleItem - ItemId
-        buffer << uint16(_equipedItems[i] ? itemModfiedAppearanceEntry->ItemAppearanceModifierID : 0);                                  // VisibleItem - ItemAppearanceModId
-        buffer << uint16(_equipedItems[i] ? DataStores::GetItemModifiedAppearanceByItemID(_equipedItems[i])->ItemAppearanceID : 0 );    // VisibleItem - ItemVisual
+        buffer << uint32(_equipedItems[i]);    // VisibleItem - ItemId
+        buffer << int32(0);                    // VisibleItem - SecondaryItemModifiedAppearanceId
+
+        uint16 itemAppearanceModId = 0;
+        if (auto itemModfiedAppearanceEntry = DataStores::GetItemModifiedAppearanceByItemID(_equipedItems[i]))
+            itemAppearanceModId = uint16(_equipedItems[i] ? itemModfiedAppearanceEntry->ItemAppearanceModifierID : 0);
+
+        buffer << uint16(itemAppearanceModId); // VisibleItem - ItemAppearanceModId
+        buffer << uint16(0);                   // VisibleItem - ItemVisual
     }
 
-    buffer << int32(672);                   // Title
+    buffer << int32(672);                   // PlayerTitle
     buffer << int32(0);                     // FakeInebriation
     buffer << uint32(0);                    // VirtualPlayerRealm
     buffer << uint32(0);                    // CurrentSpecId
     buffer << int32(0);                     // TaxiMountAnimKitId
 
-    for (std::size_t i = 0; i < 4; ++i)
+    for (std::size_t i = 0; i < 6; ++i)
     {
         buffer << float(0);                 // AvgItemLevel
     }
 
     buffer << uint8(0);                     // CurrentBattlePetBreedQuality
     buffer << int32(0);                     // HonorLevel
-    buffer << uint32(0);                    // ArenaCooldowns
+    buffer << uint32(0);                    // ArenaCooldowns.size()
     buffer << int32(0);                     // Field_B0
     buffer << int32(0);                     // Field_B4
 
-    buffer << uint32(0);                    // Field_F0_1
-    buffer << int32(0);                     // Field_F0_2
+    buffer << uint32(0);                    // CtrOptions - ContentTuningConditionMask
+    buffer << int32(0);                     // CtrOptions - Field_4
+    buffer << uint32(0);                    // CtrOptions - ExpansionLevelMask
 
-    buffer << ObjectGuid();                 // Field_F8 -- NEW
-    buffer << int32(0);                     // Field_108
-    buffer << int32(0);                     // Field_10B -- NEW
-    buffer << int32(0);                     // Field_10F -- NEW
+    buffer << int32(0);                     // CovenantID
+    buffer << int32(0);                     // SoulbindID
 
     for (auto const& options : _customizationOptions)
         buffer << options;
 
-    buffer.WriteBits<1>(0);
-    buffer.WriteBits<1>(0);
+    buffer.WriteBits<1>(0);                 // HasQuestSession
+    buffer.WriteBits<1>(0);                 // HasLevelLink
     buffer.FlushBits();
+
+    buffer << float(0.0f);                  // DungeonScore - CurrentSeasonScore
+    buffer << float(0.0f);                  // DungeonScore - LifetimeBestSeasonScore
+    buffer << uint32(0);                    // DungeonScore - Runs
 }
 
 void Character::WriteActivePlayerData(Buffer& buffer) const
 {
-    for (std::size_t i = 0; i < 199; ++i)
+    for (std::size_t i = 0; i < 218; ++i)
     {
         buffer << ObjectGuid();             // InvSlots
     }
     buffer << ObjectGuid();                 // FarsightObject
     buffer << ObjectGuid();                 // SummonedBattlePetGuid
     buffer << uint32(0);                    // KnownTitles
-    buffer << uint64(99999999999);          // Coinage
+    buffer << int64(99999999999);           // Coinage
     buffer << int32(0);                     // XP
     buffer << int32(0);                     // NextLevelXP
     buffer << int32(0);                     // TrialXP
@@ -615,13 +613,7 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
 
     buffer << int32(0);                     // CharacterPoints
     buffer << int32(7);                     // MaxTalentTiers
-    buffer << int32(0);                     // TrackCreatureMask
-
-    for (std::size_t i = 0; i < 2; ++i)
-    {
-        buffer << uint32(0);                // TrackResourceMask
-    }
-
+    buffer << uint32(0);                    // TrackCreatureMask
     buffer << float(0);                     // MainhandExpertise
     buffer << float(0);                     // OffhandExpertise
     buffer << float(0);                     // RangedExpertise
@@ -646,7 +638,7 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
     buffer << float(0);                     // PvpPowerDamage
     buffer << float(0);                     // PvpPowerHealing
 
-    for (std::size_t i = 0; i < 192; ++i)
+    for (std::size_t i = 0; i < 240; ++i)
     {
         buffer << uint64(std::numeric_limits<uint64>::max); // ExploredZones
     }
@@ -662,11 +654,11 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
         buffer << int32(0);                 // ModDamageDonePos
         buffer << int32(0);                 // ModDamageDoneNeg
         buffer << float(1);                 // ModDamageDonePercent
+        buffer << float(1);                 // ModHealingDonePercent
     }
 
     buffer << int32(0);                     // ModHealingDonePos
     buffer << float(1);                     // ModHealingPercent
-    buffer << float(1);                     // ModHealingDonePercent
     buffer << float(1);                     // ModPeriodicHealingDonePercent
 
     for (std::size_t i = 0; i < 3; ++i)
@@ -679,10 +671,9 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
     buffer << float(1);                     // ModResiliencePercent
     buffer << float(0);                     // OverrideSpellPowerByAPPercent
     buffer << float(0);                     // OverrideApBySpellPowerPercent
-
     buffer << int32(0);                     // ModTargetResistance
     buffer << int32(0);                     // ModTargetPhysicalResistance
-    buffer << int32(0);                     // LocalFlags
+    buffer << uint32(0);                    // LocalFlags
     buffer << uint8(0);                     // GrantableLevels
     buffer << uint8(0);                     // MultiActionBars
     buffer << uint8(0);                     // LifetimeMaxRank
@@ -692,7 +683,7 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
     for (std::size_t i = 0; i < 12; ++i)
     {
         buffer << uint32(0);                // BuybackPrice
-        buffer << uint32(0);                // BuybackTimestamp
+        buffer << uint64(0);                // BuybackTimestamp
     }
 
     buffer << uint16(0);                    // TodayHonorableKills
@@ -725,18 +716,16 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
     buffer << float(1);                     // UiSpellHitModifier
     buffer << int32(0);                     // HomeRealmTimeOffset
     buffer << float(0);                     // ModPetHaste
-    buffer << int8(0);                      // LocalRegenFlags
+    buffer << int8(0);                      // JailersTowerLevelMax;
+    buffer << int8(0);                      // JailersTowerLevel
+    buffer << uint8(0);                     // LocalRegenFlags
     buffer << uint8(0);                     // AuraVision
-    buffer << uint8(0);                     // NEW
-    buffer << uint8(0);                     // NEW
     buffer << uint8(24);                    // NumBackpackSlots
     buffer << int32(0);                     // OverrideSpellsId
-    buffer << int32(0);                     // LfgBonusFactionId
     buffer << uint16(0);                    // LootSpecId
     buffer << uint32(0);                    // OverrideZonePvpType
-
-    buffer << ObjectGuid();                 // NEW
-    buffer << uint64(0);                    // NEW
+    buffer << ObjectGuid();                 // BnetAccount
+    buffer << uint64(0);                    // GuildClubMemberID
 
     for (std::size_t i = 0; i < 4; ++i)
     {
@@ -753,11 +742,6 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
 
     buffer << int32(0);                     // Honor
     buffer << int32(0);                     // HonorNextLevel
-    buffer << int32(0);                     // PvpRewardAchieved
-    buffer << int32(0);                     // PvpTierMaxFromWins
-    buffer << int32(0);                     // PvpLastWeeksRewardAchieved
-    buffer << int32(0);                     // PvpLastWeeksTierMaxFromWins
-    buffer << int32(0);                     // PvpLastWeeksRwardClaimed
     buffer << uint8(5);                     // NumBankSlots
 
     buffer << uint32(0);                    // ResearchSites.size()
@@ -771,15 +755,41 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
     buffer << uint32(0);                    // Transmog.size()
     buffer << uint32(0);                    // ConditionalTransmog.size()
     buffer << uint32(0);                    // SelfResSpells.size()
+    buffer << uint32(0);                    // RuneforgePowers.size()
+    buffer << uint32(0);                    // TransmogIllusions.size()
     buffer << uint32(0);                    // CharacterRestrictions.size()
     buffer << uint32(0);                    // SpellPctModByLabel.size()
     buffer << uint32(0);                    // SpellFlatModByLabel.size()
     buffer << uint32(0);                    // Research.size()
-
-    buffer << uint32(0);                    // SpellFlatModByLabel2.size()
-    buffer << uint32(0);                    // ResearchSites.size()
+    buffer << uint32(0);                    // MawPowers.size()
+    buffer << uint32(0);                    // MultiFloorExploration.size()
+    buffer << uint32(0);                    // RecipeProgression.size()
     buffer << uint32(0);                    // ReplayedQuests.size()
     buffer << uint32(0);                    // DisabledSpells.size()
+
+    buffer << int32(0);                     // UiChromieTimeExpansionId
+    buffer << int32(0);                     // TransportServerTime
+    buffer << uint32(0);                    // WeeklyRewardsPeriodSinceOrigin
+    buffer << int16(0);                     // DEBUGSoulbindConduitRank
+    buffer << int32(0);                     // Unknown
+
+    for (std::size_t i = 0; i < 6; ++i)
+    {
+        buffer << uint32(0);                // PvpInfo - WeeklyPlayed
+        buffer << uint32(0);                // PvpInfo - WeeklyWon
+        buffer << uint32(0);                // PvpInfo - SeasonPlayed
+        buffer << uint32(0);                // PvpInfo - SeasonWon
+        buffer << uint32(0);                // PvpInfo - Rating
+        buffer << uint32(0);                // PvpInfo - WeeklyBestRating
+        buffer << uint32(0);                // PvpInfo - SeasonBestRating
+        buffer << uint32(0);                // PvpInfo - PvpTierID
+        buffer << uint32(0);                // PvpInfo - WeeklyBestWinPvpTierID
+        buffer << uint32(0);                // PvpInfo - Field_28
+        buffer << uint32(0);                // PvpInfo - Field_2C
+
+        buffer.WriteBits<1>(0);             // PvpInfo - Disqualified
+        buffer.FlushBits();
+    }
 
     buffer.WriteBits<1>(0);                 // BackpackAutoSortDisabled
     buffer.WriteBits<1>(0);                 // BankAutoSortDisabled
@@ -787,6 +797,14 @@ void Character::WriteActivePlayerData(Buffer& buffer) const
     buffer.WriteBits<1>(0);                 // InsertItemsLeftToRight
     buffer.WriteBits<1>(0);                 // QuestSession
     buffer.FlushBits();
+
+    buffer << ObjectGuid();                 // Field_1410 - Field_0
+    buffer << int32(0);                     // Field 1410 - Field_10
+
+    buffer << uint32(0);                    // Traits - TraitConfigs.size()
+
+    buffer << uint32(0);                    // DungeonScore - Seasons.size()
+    buffer << int32(0);                     // DungeonScore - TotalRuns
 }
 
 void Character::SetCanFly(bool value)
@@ -820,7 +838,8 @@ void Character::SendMessage(std::string_view message)
     packet.WriteBits<5>(0);
     packet.WriteBits<7>(0);
     packet.WriteBits<12>(message.size());
-    packet.WriteBits<11>(0);
+    packet.WriteBits<14>(0);
+    packet.WriteBits<1>(0);
     packet.WriteBits<1>(0);
     packet.WriteBits<1>(0);
     packet.WriteBits<1>(0);

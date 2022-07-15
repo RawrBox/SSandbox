@@ -110,39 +110,38 @@ public:
 
     Server(typename SocketType::RawSocketType&& socket) : SocketType(std::move(socket)), _buffer(0)
     {
-        OnRead([this]()
+        SocketType::OnRead([this]()
         {
-
-            while (std::size_t readableSize = _readBuffer.GetReadableSize())
+            while (std::size_t readableSize = SocketType::_readBuffer.GetReadableSize())
             {
                 if (std::size_t otherReadableSize = _buffer.GetRemainingSize())
                 {
                     auto min = std::min(readableSize, otherReadableSize);
-                    _buffer.Write(_readBuffer.GetReadPointer(), min);
-                    _readBuffer.AdvanceReadPos(min);
+                    _buffer.Write(SocketType::_readBuffer.GetReadPointer(), min);
+                    SocketType::_readBuffer.AdvanceReadPos(min);
 
                     if (!_buffer.GetRemainingSize())
                         HandleRest(_header.Method, _header.Url);
                 }
                 else
                 {
-                    std::string_view buffer(_readBuffer.GetReadPointer(), readableSize);
+                    std::string_view buffer(SocketType::_readBuffer.GetReadPointer(), readableSize);
                     auto loc = buffer.find("\r\n\r\n");
 
                     if (loc == std::string::npos)
                         return;
 
-                    std::string_view headerBuffer(_readBuffer.GetReadPointer(), loc + 4);
+                    std::string_view headerBuffer(SocketType::_readBuffer.GetReadPointer(), loc + 4);
 
                     auto tokens = Utils::Tokenize(headerBuffer, "\r\n", false);
 
                     if (!_header.Init(tokens))
                     {
-                        Close();
+                        SocketType::Close();
                         return;
                     }
 
-                    _readBuffer.AdvanceReadPos(loc + 4);
+                    SocketType::_readBuffer.AdvanceReadPos(loc + 4);
 
                     auto length = _header.GetHeaderValue("Content-Length");
 
@@ -152,7 +151,7 @@ public:
 
                         if (!Utils::StrToInt(length, intLength) || intLength > 128 * 1024 * 1024)
                         {
-                            Close();
+                            SocketType::Close();
                             return;
                         }
                         _buffer.Reset(intLength);
@@ -166,12 +165,12 @@ public:
             }
         });
 
-        _socket.async_handshake(boost::asio::ssl::stream_base::server, [this](boost::system::error_code error)
+        SocketType::_socket.async_handshake(boost::asio::ssl::stream_base::server, [this](boost::system::error_code error)
         {
             if (!error)
-                AsyncRead();
+                SocketType::AsyncRead();
             else
-                Close();
+                SocketType::Close();
         });
     }
 

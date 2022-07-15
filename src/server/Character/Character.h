@@ -138,13 +138,6 @@ private:
     uint8 _race;
     uint8 _class;
     uint8 _sex;
-    uint8 _skin;
-    uint8 _face;
-    uint8 _hairStyle;
-    uint8 _hairColor;
-    uint8 _facialHairStyle;
-    uint8 _outfitID;
-    std::array<uint8, 3> _customDisplayData;
     std::vector<CustomizationOption> _customizationOptions;
 
     uint8 _level;
@@ -155,7 +148,7 @@ private:
 
     std::string _name;
 
-    std::array<uint32, 23> _equipedItems;
+    std::array<uint32, 35> _equipedItems;
     std::array<SkillInfo, 256> _skills;
     std::vector<uint32> _knownSpells;
 

@@ -22,7 +22,7 @@ namespace Globals
 {
     enum
     {
-        MaxLevel = 60,
-        Expansion = 8,
+        MaxLevel = 70,
+        Expansion = 9,
     };
 } // Globals

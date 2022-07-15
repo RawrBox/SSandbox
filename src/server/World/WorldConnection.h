@@ -411,6 +411,8 @@ public:
             _info[35] = { {1, 7, 7}, {4, 7, 7}, {10, 7, 7}, {3, 7, 7}, {5, 7, 7}, {8, 7, 7}, {9, 7, 7}, {7, 7, 7}, {6, 7, 8} };
             _info[36] = { {1, 7, 7}, {3, 7, 7}, {8, 7, 7}, {10, 7, 7}, {5, 7, 7}, {4, 7, 7}, {7, 7, 7}, {6, 7, 8} };
             _info[37] = { {1, 7, 7}, {4, 7, 7}, {10, 7, 7}, {3, 7, 7}, {5, 7, 7}, {8, 7, 7}, {9, 7, 7}, {6, 7, 8} };
+            _info[52] = { {13, 9, 9} };
+            _info[70] = { {13, 9, 9} };
         }
 
         struct ClassInfo
@@ -458,7 +460,7 @@ public:
         packet << uint32(raceClassInfo.GetCount());
         packet << uint32(0);
         packet << uint32(0);
-        packet << int32(int32(time(nullptr)));
+        packet << time(nullptr);
 
         packet << raceClassInfo;
 
@@ -606,16 +608,9 @@ public:
     {
         uint8 Enabled = 1;
 
-        Crypt::HmacSha256 keyHash(_aesKey.data(), _aesKey.size());
-        keyHash.UpdateData(&Enabled, 1);
-        keyHash.UpdateData(EnableEncryptionSeed, sizeof(EnableEncryptionSeed));
-        keyHash.Finalize();
-
-        std::size_t rsaLen = Crypt::ConnectToRSA.GetOutputLength();
-
-        Packet enableEncryption(Opcode::SMSG_ENABLE_ENCRYPTION, rsaLen + 1);
-        Crypt::ConnectToRSA.Sign(keyHash.GetDigest(), Crypt::HmacSha256::Length, enableEncryption.GetBuffer() + 2);
-        enableEncryption.AdvanceWritePos(rsaLen);
+        Packet enableEncryption(Opcode::SMSG_ENABLE_ENCRYPTION, 64 + 1);
+        for (uint32 i = 0; i < 64; ++i)
+            enableEncryption << uint8(0);
         enableEncryption.WriteBits<1>(Enabled);
         enableEncryption.FlushBits();
         SendPacket(enableEncryption);

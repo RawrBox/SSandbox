@@ -548,7 +548,7 @@ private:
 
                                     if (elem.HasMember("secret"))
                                     {
-                                        auto& arr = elem["secret"].GetArray();
+                                        auto arr = elem["secret"].GetArray();
                                         std::array<uint8, 32> clientSecret;
 
                                         if (arr.Size() != clientSecret.size())

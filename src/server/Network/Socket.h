@@ -17,7 +17,9 @@
  */
 
 #pragma once
+#include "Defines.h"
 #include "SocketBuffer.h"
+#include <boost/asio/ip/tcp.hpp>
 
 namespace asio = boost::asio;
 namespace Network

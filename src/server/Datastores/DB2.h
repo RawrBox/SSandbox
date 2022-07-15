@@ -147,6 +147,16 @@ public:
                             offset += sizeof(int32);
                             break;
                         }
+                        case 'l':
+                        {
+                            uint64 value;
+                            std::from_chars(str.data(), str.data() + str.size(), value);
+
+                            _align<uint64>(offset);
+                            new (rowBuffer + offset) uint64(value);
+                            offset += sizeof(uint64);
+                            break;
+                        }
                         case 's':
                         {
                             _align<std::string>(offset);

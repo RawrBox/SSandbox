@@ -1,38 +1,47 @@
-ClientPrefix,ClientFileString,Name_lang,Name_female_lang,Name_lowercase_lang,Name_female_lowercase_lang,Field_9_0_1_33978_006_lang,Field_9_0_1_33978_006_female_lang,Field_9_0_1_33978_006_lowercase_lang,Field_9_0_1_33978_006_female_lowercase_lang,RaceFantasyDescription_lang,Field_9_0_1_33978_010_lang,Field_9_0_1_33978_010_female_lang,Field_9_0_1_33978_010_lowercase_lang,Field_9_0_1_33978_010_female_lowercase_lang,ID,Flags,CreateScreenFileDataID,SelectScreenFileDataID,LowResScreenFileDataID,AlteredFormStartVisualKitID[0],AlteredFormStartVisualKitID[1],AlteredFormStartVisualKitID[2],AlteredFormFinishVisualKitID[0],AlteredFormFinishVisualKitID[1],AlteredFormFinishVisualKitID[2],HeritageArmorAchievementID,StartingLevel,UiDisplayOrder,PlayableRaceBit,BaseRaceID,TransmogrifyDisabledSlotMask,FactionID,CinematicSequenceID,ResSicknessSpellID,SplashSoundID,BaseLanguage,CreatureType,Alliance,Race_related,UnalteredVisualRaceID,DefaultClassID,NeutralRaceID,MaleModelFallbackRaceID,MaleModelFallbackSex,FemaleModelFallbackRaceID,FemaleModelFallbackSex,MaleTextureFallbackRaceID,MaleTextureFallbackSex,FemaleTextureFallbackRaceID,FemaleTextureFallbackSex
-Hu,Human,Human,,human,,,,,,The noble humans of Stormwind stand at the forefront of the Alliance against the enemies of Azeroth.,,,,,1,6292620,623712,131948,651555,0,0,0,47268,47268,47268,0,1,0,0,0,0,1,81,15007,1096,7,7,0,2,0,5,0,0,-1,0,-1,0,-1,0,3
-Or,Orc,Orc,,orc,,,,,,"The mighty orcs came to Azeroth as conquerors, but now strive to reclaim their ancient honor and traditions.",,,,,2,6291596,623714,132003,651558,0,0,0,0,0,0,0,1,0,1,0,0,2,21,15007,1096,1,7,1,1,0,1,0,0,-1,0,-1,0,-1,0,-1
-Dw,Dwarf,Dwarf,,dwarf,,,,,,The stout dwarves of Ironforge are famed explorers who delve into the world's ancient secrets.,,,,,3,6291596,623712,131940,651555,0,0,0,0,0,0,0,1,0,2,0,0,3,41,15007,1090,7,7,0,8,0,3,0,0,-1,0,-1,0,-1,0,-1
-Ni,NightElf,Night Elf,,night elf,,Kaldorei,,kaldorei,,The mystical night elves defend the wilds of Azeroth against any who mean harm to nature.,Elf,,elf,,4,6291588,623712,131993,651555,0,0,0,0,0,0,0,1,0,3,0,0,4,61,15007,1096,7,7,0,5,0,11,0,0,-1,0,-1,0,-1,0,-1
-Sc,Scourge,Undead,,undead,,,,,,"Raised into undeath, the Forsaken have built a bold future out of the ruins of a darkened past.",,,,,5,6291596,623714,132035,651558,0,0,0,0,0,0,0,1,0,4,0,0,5,2,15007,1096,1,7,1,4,0,9,0,0,-1,0,-1,0,-1,0,-1
-Ta,Tauren,Tauren,,tauren,,,,,,The massive tauren serve their beloved Earth Mother and protect the balance of nature.,,,,,6,6291590,623714,132046,651558,0,0,0,0,0,0,0,1,0,5,0,0,6,141,15007,1096,1,7,1,7,0,7,0,0,-1,0,-1,0,-1,0,-1
-Gn,Gnome,Gnome,,gnome,,,,,,The diminutive and ingenious gnomes are renowned for creating countless technological wonders.,,,,,7,6291596,623712,430171,651555,0,0,0,0,0,0,0,1,0,6,0,0,115,101,15007,1096,7,7,0,6,0,9,0,0,-1,0,-1,0,-1,0,-1
-Tr,Troll,Troll,,troll,,,,,,"Driven from their jungle homeland by rival tribes, the Darkspear trolls found allies in the mighty Horde.",,,,,8,6291598,623714,429097,651558,0,0,0,0,0,0,0,1,0,7,0,0,116,121,15007,1096,1,7,1,3,0,7,0,0,-1,0,-1,0,-1,0,-1
-Go,Goblin,Goblin,,goblin,,,,,,"Always inventive and often reckless, goblins are known as skilled engineers and talented merchants.",,,,,9,6291716,623714,319097,651558,0,0,0,0,0,0,0,1,10,8,0,0,2204,172,15007,1096,1,7,1,22,0,4,0,0,-1,0,-1,0,-1,0,-1
-Be,BloodElf,Blood Elf,,blood elf,,Sindorei,,sindorei,,"Survivors of a brutal war, the blood elves drew strength from the magical Sunwell to rebuild their kingdom.",Elf,,elf,,10,6291596,623714,131921,651558,0,0,0,0,0,0,0,1,9,9,0,0,1610,162,15007,1096,1,7,1,11,0,8,0,0,-1,0,-1,0,-1,0,-1
-Dr,Draenei,Draenei,,draenei,,,,,,The draenei fled from demonic corruption and now lend their might to defend Azeroth.,,,,,11,6291598,623712,131934,651555,0,0,0,0,0,0,0,1,0,10,0,0,1629,163,15007,1096,7,7,0,10,0,2,0,0,-1,0,-1,0,-1,0,-1
-Fo,FelOrc,Fel Orc,,fel orc,,,,,,,,,,,12,262149,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-Na,Naga_,Naga,,naga,,,,,,,,,,,13,1,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-Br,Broken,Broken,,broken,,,,,,,,,,,14,5,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-Sk,Skeleton,Skeleton,,skeleton,,,,,,,,,,,15,1,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,5,0,5,1,5,0,5,1
-Vr,Vrykul,Vrykul,,vrykul,,,,,,,,,,,16,9,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-Tu,Tuskarr,Tuskarr,,tuskarr,,,,,,,,,,,17,262145,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-Ft,ForestTroll,Forest Troll,,forest troll,,,,,,,,,,,18,15,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-Wt,Taunka,Taunka,,taunka,,,,,,,,,,,19,5,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-NS,NorthrendSkeleton,Northrend Skeleton,,Northrend skeleton,,,,,,,,,,,20,5,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-It,IceTroll,Ice Troll,,ice troll,,,,,,,,,,,21,5,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,0,1,0,15007,1096,7,7,2,0,0,0,0,0,-1,0,-1,0,-1,0,-1
-Wo,Worgen,Worgen,,worgen,,,,,,"A curse turned the humans of Gilneas into savage worgen, who harness their ferocity to aid their allies.",,,,,22,23068742,623712,313254,651555,0,47273,0,47268,47239,47268,0,1,0,21,0,0,2203,170,15007,1096,7,7,0,9,1,6,0,0,-1,0,-1,0,-1,0,-1
-Hu,Human,Gilnean,,Gilnean,,,,,,The worgen were first unleashed upon the Eastern Kingdoms by Archmage Arugal. <PH>,,,,,23,237,623712,313254,651555,0,0,0,47268,47268,47268,0,1,0,-1,0,0,1,0,15007,1096,7,7,0,0,0,0,0,1,0,1,1,1,0,1,1
-Pa,Pandaren,Pandaren,,pandaren,,,,,,"A spiritual and inquisitive people, the pandaren have a deep love for cooking, brewing, and adventure.",,,,,24,6543380,623716,574549,651561,0,0,0,0,0,0,0,1,0,23,0,0,2395,259,15007,1096,42,7,2,0,0,10,0,0,-1,0,-1,0,-1,0,-1
-Pa,Pandaren,Pandaren,,pandaren,,,,,,"A spiritual and inquisitive people, the pandaren have a deep love for cooking, brewing, and adventure.",,,,,25,211460,623712,574549,651555,0,0,0,0,0,0,0,1,0,24,0,0,2401,259,15007,1096,7,7,0,26,0,0,24,24,0,24,1,24,0,24,1
-Pa,Pandaren,Pandaren,,pandaren,,,,,,"A spiritual and inquisitive people, the pandaren have a deep love for cooking, brewing, and adventure.",,,,,26,211460,623714,574549,651558,0,0,0,0,0,0,0,1,0,25,0,0,2402,259,15007,1096,1,7,1,25,0,0,24,24,0,24,1,24,0,24,1
-Nb,Nightborne,Nightborne,,nightborne,,,,,,"Secluded in Suramar for 10,000 years, the nightborne developed unrivaled mastery of the arcane arts.",,,,,27,11010052,623714,1662240,651558,0,0,0,0,0,0,12413,10,1,26,0,0,1610,0,15007,1096,1,7,1,29,0,8,0,4,0,4,1,4,0,4,1
-Ht,HighmountainTauren,Highmountain Tauren,,tauren,,,,,,"Honoring the spirits of earth, river, and sky, the Highmountain tauren embody nobility and strength.",,,,,28,8912902,623714,1662239,651558,0,0,0,0,0,0,12415,10,2,27,0,0,6,0,15007,1096,1,7,1,30,0,3,0,6,0,6,1,6,0,6,1
-Ve,VoidElf,Void Elf,,void elf,,,,,,"Transformed by forbidden magic, the void elves were cast out by their kin and now fight for the Alliance.",,,,,29,9961484,623712,1662242,651555,0,0,0,0,0,0,12291,10,1,28,0,0,4,0,15007,1096,7,7,0,27,0,8,0,10,0,10,1,10,0,10,1
-Ld,LightforgedDraenei,Lightforged Draenei,,draenei,,,,,,The Lightforged draenei were infused with the Holy Light to become living weapons against evil.,,,,,30,8912910,623712,1662241,651555,0,0,0,0,0,0,12414,10,2,29,0,0,1629,0,15007,1096,7,7,0,28,0,2,0,11,0,11,1,11,0,11,1
-Za,ZandalariTroll,Zandalari Troll,,Zandalari,,,,,,The Zandalari revere their mystical loa and command one of Azeroth's most formidable fleets.,,,,,31,15204358,623714,2743642,651558,0,0,0,0,0,0,13503,10,4,30,8,0,116,0,15007,1096,1,7,1,32,0,0,0,0,-1,8,1,0,-1,8,1
-Kt,KulTiran,Kul Tiran,,Kul Tiran,,,,,,"After years of isolation, the proud Kul Tirans once more lend their naval might to the Alliance.",,,,,32,15204364,623712,2575493,651555,0,0,0,0,0,0,13504,10,4,31,1,0,1,0,15007,1096,7,7,0,31,0,0,0,0,-1,0,-1,0,-1,0,-1
-Th,ThinHuman,Human,,human,,,,,,Kul Tiras was founded by fearless explorers who sailed uncharted waters in search of adventure. <PH>,,,,,33,525,0,0,0,0,0,0,0,0,0,0,1,0,-1,1,0,1,0,15007,1096,7,7,2,0,0,0,0,5,1,0,-1,5,0,0,-1
-Di,DarkIronDwarf,Dark Iron Dwarf,,dwarf,,,,,,"With fiery tempers and fierce determination, the Dark Iron fight alongside their dwarven kin.",,,,,34,8912908,623712,2005930,651555,0,0,0,0,0,0,13076,10,3,11,3,0,3,0,15007,1090,7,7,0,36,0,1,0,3,0,3,1,3,0,3,1
-Vu,Vulpera,Vulpera,,vulpera,,,,,,"Cunning and resourceful, the vulpera have a knack for thriving in the harshest conditions.",,,,,35,15204358,623714,3188841,651558,0,0,0,0,0,0,0,10,10,12,9,0,2204,0,15007,1096,1,7,1,37,0,4,0,0,-1,0,-1,0,-1,0,-1
-Mo,MagharOrc,Mag'har Orc,,orc,,,,,,"Once rival clans, the uncorrupted orcs of Draenor now stand united as the ferocious Mag'har.",,,,,36,8912908,623714,2005932,651558,0,0,0,0,0,0,13077,10,3,13,2,0,2,0,15007,1096,1,7,1,34,0,1,0,2,0,2,1,2,0,2,1
-Mg,Mechagnome,Mechagnome,,mechagnome,,,,,,"The clever mechagnomes strive to balance flesh with technology, making them innovative allies.",,,,,37,15204364,623712,3188839,651555,0,0,0,0,0,0,14014,10,0,14,0,896,115,0,15007,1096,7,7,0,35,0,1,0,7,0,7,1,7,0,7,1
+ID,Alliance,PlayableRaceBit
+1,0,0
+2,1,1
+3,0,2
+4,0,3
+5,1,4
+6,1,5
+7,0,6
+8,1,7
+9,1,8
+10,1,9
+11,0,10
+12,2,-1
+13,2,-1
+14,2,-1
+15,2,-1
+16,2,-1
+17,2,-1
+18,2,-1
+19,2,-1
+20,2,-1
+21,2,-1
+22,0,21
+23,0,-1
+24,2,23
+25,0,24
+26,1,25
+27,1,26
+28,1,27
+29,0,28
+30,0,29
+31,1,30
+32,0,31
+33,2,-1
+34,0,11
+35,1,12
+36,1,13
+37,0,14
+52,0,16
+70,1,15
+71,2,-1
+72,2,-1
+73,2,-1
+74,2,-1
+75,0,-1
+76,1,-1
+77,2,-1

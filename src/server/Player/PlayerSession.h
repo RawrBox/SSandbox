@@ -37,7 +37,7 @@ namespace Player
     enum class ResponseCodes : uint8
     {
         CreationSucess  = 24,
-        DeletionSuccess = 52,
+        DeletionSuccess = 53,
     };
 
 class Session
@@ -55,7 +55,7 @@ public:
     void HandleCreateCharacter(Packet const& packet);
     void HandleDeleteCharacter(Packet const& packet);
     void HandlePlayerLogin(Packet const& packet);
-    void HandleQueryPlayerName(Packet const& packet);
+    void HandleQueryPlayerNames(Packet const& packet);
     void HandleChat(Packet const& packet);
     void HandleMovement(Packet const& packet);
     void HandleLogout(Packet const& packet);

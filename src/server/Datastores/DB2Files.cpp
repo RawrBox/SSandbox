@@ -22,11 +22,17 @@
 
 namespace DataStores
 {
+    std::unordered_map<uint32, std::vector<uint32>> CharacterLoadoutToCharacterLoadoutItem;
     std::unordered_map<uint32, std::map<uint32, Structures::ItemModifiedAppearence::Structure const*>> ItemIDToModifiedAppearance;
-    std::unordered_map<uint32, std::array<uint32, 2>> ChrRaceToDisplayID;
+    std::unordered_map<uint32, std::array<uint32, 4>> ChrRaceToDisplayID;
 
     void LoadAdditionalInfo()
     {
+        for (auto const& characterLoadoutItem : CharacterLoadoutItem)
+        {
+            CharacterLoadoutToCharacterLoadoutItem[characterLoadoutItem.CharacterLoadoutID].push_back(characterLoadoutItem.ItemID);
+        }
+
         for (auto const& modifiedAppearence : ItemModifiedAppearence)
         {
             ItemIDToModifiedAppearance[modifiedAppearence.ItemID].emplace(modifiedAppearence.ItemAppearanceModifierID, &modifiedAppearence);
@@ -35,8 +41,19 @@ namespace DataStores
         for (auto const& raceXModel : ChrRaceXChrModel)
         {
             auto chrModelEntry = ChrModel[raceXModel.ChrModelID];
-            ChrRaceToDisplayID[raceXModel.RaceID][chrModelEntry->Sex] = chrModelEntry->DisplayID;
+            ChrRaceToDisplayID[raceXModel.ChrRacesID][chrModelEntry->Sex] = chrModelEntry->DisplayID;
         }
+    }
+
+    std::vector<uint32> GetItemsForCharacterLoadout(uint32 raceID, uint32 classID, uint32 purpose)
+    {
+        auto chrRacesEntry = ChrRaces[raceID];
+
+        for (auto& characterLoadout : CharacterLoadout)
+            if ((chrRacesEntry->PlayableRaceBit & characterLoadout.Racemask) != 0 && characterLoadout.ChrClassID == classID && characterLoadout.Purpose == purpose)
+                return CharacterLoadoutToCharacterLoadoutItem[characterLoadout.ID];
+
+        return std::vector<uint32>();
     }
 
     Structures::ItemModifiedAppearence::Structure const* GetItemModifiedAppearanceByItemID(uint32 itemID, uint32 ItemAppearanceModifierID)
@@ -52,6 +69,9 @@ namespace DataStores
     uint32 GetDisplayIDForRace(uint32 raceID, uint32 sex)
     {
         auto iter = ChrRaceToDisplayID.find(raceID);
-        return iter != ChrRaceToDisplayID.end() ? iter->second[sex] : 0;
+        if (iter == ChrRaceToDisplayID.end())
+            return 0;
+
+        return iter->second[sex] != 0 ? iter->second[sex] : iter->second[3];
     }
 } // Datastores
